@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_note">
+
+    <fragment
+        android:id="@+id/nav_note"
+        android:name="com.example.ttnote.ui.home.HomeFragment"
+        android:label="@string/menu_note"
+        tools:layout="@layout/fragment_note" />
+
+    <fragment
+        android:id="@+id/nav_gallery"
+        android:name="com.example.ttnote.ui.gallery.GalleryFragment"
+        android:label="@string/menu_mission"
+        tools:layout="@layout/fragment_mission" />
+
+    <fragment
+        android:id="@+id/nav_slideshow"
+        android:name="com.example.ttnote.ui.slideshow.SlideshowFragment"
+        android:label="@string/menu_remind"
+        tools:layout="@layout/fragment_remind" />
+
+    <fragment
+        android:id="@+id/nav_tools"
+        android:name="com.example.ttnote.ui.tools.ToolsFragment"
+        android:label="@string/menu_recycle_bin"
+        tools:layout="@layout/fragment_recycle_bin" />
+
+    <fragment
+        android:id="@+id/nav_share"
+        android:name="com.example.ttnote.ui.share.ShareFragment"
+        android:label="@string/menu_setting"
+        tools:layout="@layout/fragment_setting" />
+
+    <fragment
+        android:id="@+id/nav_send"
+        android:name="com.example.ttnote.ui.send.SendFragment"
+        android:label="@string/menu_help"
+        tools:layout="@layout/fragment_help" />
+</navigation>
