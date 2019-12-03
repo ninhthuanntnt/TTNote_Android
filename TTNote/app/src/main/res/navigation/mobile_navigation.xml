@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_note" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.example.ttnote.ui.gallery.GalleryFragment"
-        android:label="@string/menu_mission"
-        tools:layout="@layout/fragment_mission" />
+        android:id="@+id/nav_task"
+        android:name="com.example.ttnote.ui.task.TaskFragment"
+        android:label="@string/menu_task"
+        tools:layout="@layout/fragment_task" />
 
     <fragment
         android:id="@+id/nav_slideshow"

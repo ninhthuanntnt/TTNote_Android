@@ -89,31 +89,31 @@ public class NoteAdditionActivity extends AppCompatActivity {
                 Calendar calendar = Calendar.getInstance();
                 switch (menuItem.getItemId()) {
                     // choose date
-                    case R.id.navigation_calender:
-                        int year = calendar.get(Calendar.YEAR);
-                        final int month = calendar.get(Calendar.MONTH);
-                        int day = calendar.get(Calendar.DAY_OF_MONTH);
-                        DatePickerDialog datePickerDialog = new DatePickerDialog(NoteAdditionActivity.this, new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                                scheduleNote.set(year, monthOfYear, dayOfMonth);
-                            }
-                        }, year, month, day);
-                        datePickerDialog.show();
-                        return true;
-                    // choose time
-                    case R.id.navigation_time:
-                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                        final int minute = calendar.get(Calendar.MINUTE);
-                        TimePickerDialog timePickerDialog = new TimePickerDialog(NoteAdditionActivity.this, new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePicker timePicker, int hour, int minutes) {
-                                scheduleNote.set(Calendar.HOUR_OF_DAY, hour);
-                                scheduleNote.set(Calendar.MINUTE, minutes);
-                            }
-                        }, hour, minute, true);
-                        timePickerDialog.show();
-                        return true;
+//                    case R.id.navigation_calender:
+//                        int year = calendar.get(Calendar.YEAR);
+//                        final int month = calendar.get(Calendar.MONTH);
+//                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+//                        DatePickerDialog datePickerDialog = new DatePickerDialog(NoteAdditionActivity.this, new DatePickerDialog.OnDateSetListener() {
+//                            @Override
+//                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+//                                scheduleNote.set(year, monthOfYear, dayOfMonth);
+//                            }
+//                        }, year, month, day);
+//                        datePickerDialog.show();
+//                        return true;
+//                    // choose time
+//                    case R.id.navigation_time:
+//                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//                        final int minute = calendar.get(Calendar.MINUTE);
+//                        TimePickerDialog timePickerDialog = new TimePickerDialog(NoteAdditionActivity.this, new TimePickerDialog.OnTimeSetListener() {
+//                            @Override
+//                            public void onTimeSet(TimePicker timePicker, int hour, int minutes) {
+//                                scheduleNote.set(Calendar.HOUR_OF_DAY, hour);
+//                                scheduleNote.set(Calendar.MINUTE, minutes);
+//                            }
+//                        }, hour, minute, true);
+//                        timePickerDialog.show();
+//                        return true;
                     // choose color
                     case R.id.navigation_color:
 //                        AmbilWarnaDialog colorPickerDialog = new AmbilWarnaDialog(NoteAdditionActivity.this, 5, new AmbilWarnaDialog.OnAmbilWarnaListener() {
@@ -142,7 +142,6 @@ public class NoteAdditionActivity extends AppCompatActivity {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                note.setDate(scheduleNote.getTimeInMillis());
                 note.setCreatedDate((new Date()).getTime());
 
                 if (!edtTitle.getText().toString().isEmpty() && !edtContent.getText().toString().isEmpty()) {

@@ -9,9 +9,9 @@ tools:showIn="navigation_view">
         android:icon="@drawable/ic_note"
         android:title="@string/menu_note" />
     <item
-        android:id="@+id/nav_gallery"
+        android:id="@+id/nav_task"
         android:icon="@drawable/ic_mission"
-        android:title="@string/menu_mission" />
+        android:title="@string/menu_task" />
     <item
         android:id="@+id/nav_slideshow"
         android:icon="@drawable/ic_remind"

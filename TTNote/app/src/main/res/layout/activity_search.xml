@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SearchActivity">
+    tools:context=".SearchActivity"
+    android:orientation="vertical">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tool_bar"
         android:layout_width="match_parent"
@@ -18,15 +19,27 @@
                 android:id="@+id/edt_search"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:inputType="text"
                 android:hint="search"
                 android:layout_weight="0.9"/>
             <ImageView
+                android:id="@+id/btn_search"
                 android:layout_width="0dp"
                 android:layout_height="30dp"
                 android:src="@drawable/ic_search_64"
                 android:layout_marginTop="5dp"
                 android:layout_marginRight="10dp"
-                android:layout_weight="0.1"/>
+                android:layout_weight="0.1"
+                android:clickable="true"/>
         </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 </LinearLayout>

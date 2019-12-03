@@ -1,6 +1,7 @@
 package com.example.ttnote.Model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class NoteModel implements Serializable {
     private int id;
@@ -10,14 +11,16 @@ public class NoteModel implements Serializable {
     private long date;
     private int background;
     private boolean status;
+    private ArrayList<TaskModel> tasks;
 
     public NoteModel() {
         this.background = -1;
         this.status = true;
         this.date = 0;
+        this.tasks = null;
     }
 
-    public NoteModel(int id, String title, String content, long createdDate, long date, int background, boolean status) {
+    public NoteModel(int id, String title, String content, long createdDate, long date, int background, boolean status, ArrayList<TaskModel> tasks) {
         this.id = id;
         this.title = title;
         this.content = content;
@@ -25,6 +28,7 @@ public class NoteModel implements Serializable {
         this.date = date;
         this.background = background;
         this.status = status;
+        this.tasks = tasks;
     }
 
     public int getId() {
@@ -81,5 +85,13 @@ public class NoteModel implements Serializable {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public ArrayList<TaskModel> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(ArrayList<TaskModel> tasks) {
+        this.tasks = tasks;
     }
 }

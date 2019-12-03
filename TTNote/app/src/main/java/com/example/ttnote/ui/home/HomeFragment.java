@@ -39,6 +39,7 @@ public class HomeFragment extends Fragment {
     private FloatingActionButton btnAdd;
     public static final int ADD_NOTE_CODE = 1002;
     public static final int UPDATE_NOTE_CODE = 6515;
+    public static final int SEARCH_NOTE_CODE = 5621;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -51,6 +52,14 @@ public class HomeFragment extends Fragment {
         rvNoteList = root.findViewById(R.id.rv_note_list);
         btnAdd = root.findViewById(R.id.btn_add);
         notes = db.getAllNotes();
+        //note filter
+        ArrayList<NoteModel> notesTemp = new ArrayList<>();
+        for(int i=0 ; i < notes.size(); i++){
+            if(notes.get(i).getTasks().isEmpty()){
+                notesTemp.add(notes.get(i));
+            }
+        }
+        notes = notesTemp;
 
         //set adapter to list view
         noteAdapter = new NoteAdapter(notes, this);
@@ -70,7 +79,7 @@ public class HomeFragment extends Fragment {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                startActivity(new Intent(getContext(), SearchActivity.class));
+                startActivityForResult(new Intent(getContext(), SearchActivity.class), SEARCH_NOTE_CODE);
                 return false;
             }
         });
@@ -111,7 +120,12 @@ public class HomeFragment extends Fragment {
                 notes.addAll(db.getAllNotes());
                 noteAdapter.notifyDataSetChanged();
             }
-        }
 
+        }
+        if(requestCode == SEARCH_NOTE_CODE){
+            notes.clear();
+            notes.addAll(db.getAllNotes());
+            noteAdapter.notifyDataSetChanged();
+        }
     }
 }

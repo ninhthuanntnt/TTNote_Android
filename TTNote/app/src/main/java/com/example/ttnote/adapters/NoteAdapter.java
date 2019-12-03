@@ -88,7 +88,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("note",note);
                 intent.putExtras(bundle);
-                fragment.startActivityForResult(intent,UPDATE_NOTE_CODE);
+                if(fragment != null) {
+                    fragment.startActivityForResult(intent, UPDATE_NOTE_CODE);
+                }else{
+                    ((Activity) context).startActivityForResult(intent, UPDATE_NOTE_CODE);
+                }
             }
         });
     }
