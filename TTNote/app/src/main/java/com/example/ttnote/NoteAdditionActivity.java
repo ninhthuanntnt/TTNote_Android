@@ -116,23 +116,17 @@ public class NoteAdditionActivity extends AppCompatActivity {
 //                        return true;
                     // choose color
                     case R.id.navigation_color:
-//                        AmbilWarnaDialog colorPickerDialog = new AmbilWarnaDialog(NoteAdditionActivity.this, 5, new AmbilWarnaDialog.OnAmbilWarnaListener() {
-//                            @Override
-//                            public void onCancel(AmbilWarnaDialog dialog) {
-//                            }
-//
-//                            @Override
-//                            public void onOk(AmbilWarnaDialog dialog, int color) {
-//                                note.setBackground(color);
-//                            }
-//                        });
-//                        colorPickerDialog.show();
-                        opeColorPicker();
+                        openColorPicker();
                         return true;
                     // remove diary
                     case R.id.navigation_remove:
-                        edtTitle.setText("");
-                        edtContent.setText("");
+                        note.setStatus(false);
+                        Intent intent = getIntent();
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("note", note);
+                        intent.putExtras(bundle);
+                        setResult(Activity.RESULT_OK, intent);
+                        finish();
                         return true;
                 }
                 return false;
@@ -147,9 +141,6 @@ public class NoteAdditionActivity extends AppCompatActivity {
                 if (!edtTitle.getText().toString().isEmpty() && !edtContent.getText().toString().isEmpty()) {
                     note.setTitle(edtTitle.getText().toString());
                     note.setContent(edtContent.getText().toString());
-
-//                    TTNoteDatabase db = new TTNoteDatabase(NoteAdditionActivity.this);
-//                    db.addNote(note);
 
                     Intent intent = getIntent();
                     Bundle bundle = new Bundle();
@@ -170,7 +161,7 @@ public class NoteAdditionActivity extends AppCompatActivity {
         return true;
     }
 
-    public void opeColorPicker() {
+    public void openColorPicker() {
         final ColorPicker colorPicker = new ColorPicker(this);
         ArrayList<String> colors = new ArrayList<>();
         colors.add("#eb8360");

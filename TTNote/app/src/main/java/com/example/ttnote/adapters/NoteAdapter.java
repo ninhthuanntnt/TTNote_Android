@@ -19,7 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.ttnote.Model.NoteModel;
 import com.example.ttnote.NoteAdditionActivity;
 import com.example.ttnote.R;
+import com.example.ttnote.TaskNoteAdditionActivity;
 import com.example.ttnote.ui.home.HomeFragment;
+import com.example.ttnote.ui.task.TaskFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,12 +32,15 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     private ArrayList<NoteModel> notes;
     private Context context;
     private Fragment fragment;
+    private int updateCode = 0;
 
-    public static final int UPDATE_NOTE_CODE = 6515;
+    private static final int UPDATE_NOTE_CODE = 6515;
+    private static final int UPDATE_TASK_NOTE_CODE = 9541;
 
-    public NoteAdapter(ArrayList<NoteModel> notes, Fragment fragment) {
+    public NoteAdapter(ArrayList<NoteModel> notes, Fragment fragment, int updateCode) {
         this.notes = notes;
         this.fragment = fragment;
+        this.updateCode = updateCode;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
@@ -66,7 +71,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int position) {
         final NoteModel note = notes.get(position);
         viewHolder.tvTitle.setText(note.getTitle());
         viewHolder.tvContent.setText(note.getContent());
@@ -84,14 +89,24 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
         viewHolder.llCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context,NoteAdditionActivity.class);
+                Intent intent = null;
+
+                if (updateCode == UPDATE_NOTE_CODE)
+                    intent = new Intent(context, NoteAdditionActivity.class);
+                if(updateCode == UPDATE_TASK_NOTE_CODE)
+                    intent = new Intent(context, TaskNoteAdditionActivity.class);
+
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("note",note);
+                bundle.putSerializable("note",notes.get(position));
                 intent.putExtras(bundle);
+
                 if(fragment != null) {
-                    fragment.startActivityForResult(intent, UPDATE_NOTE_CODE);
+                    if(fragment instanceof HomeFragment)
+                        fragment.startActivityForResult(intent, UPDATE_NOTE_CODE);
+                    if(fragment instanceof TaskFragment)
+                        fragment.startActivityForResult(intent, UPDATE_TASK_NOTE_CODE);
                 }else{
-                    ((Activity) context).startActivityForResult(intent, UPDATE_NOTE_CODE);
+                    ((Activity) context).startActivityForResult(intent, updateCode);
                 }
             }
         });

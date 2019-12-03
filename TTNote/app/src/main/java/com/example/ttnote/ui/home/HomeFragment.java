@@ -47,7 +47,7 @@ public class HomeFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_note, container, false);
 
         //init
-        androidx.appcompat.widget.Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         db = new TTNoteDatabase(getContext());
         rvNoteList = root.findViewById(R.id.rv_note_list);
         btnAdd = root.findViewById(R.id.btn_add);
@@ -62,7 +62,7 @@ public class HomeFragment extends Fragment {
         notes = notesTemp;
 
         //set adapter to list view
-        noteAdapter = new NoteAdapter(notes, this);
+        noteAdapter = new NoteAdapter(notes, this, UPDATE_NOTE_CODE);
         rvNoteList.setAdapter(noteAdapter);
         rvNoteList.setLayoutManager(new LinearLayoutManager(root.getContext()));
 
@@ -79,7 +79,9 @@ public class HomeFragment extends Fragment {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                startActivityForResult(new Intent(getContext(), SearchActivity.class), SEARCH_NOTE_CODE);
+                Intent intent = new Intent(getActivity(), SearchActivity.class);
+                intent.putExtra("requestCode", UPDATE_NOTE_CODE);
+                startActivityForResult(intent, SEARCH_NOTE_CODE);
                 return false;
             }
         });
@@ -105,17 +107,17 @@ public class HomeFragment extends Fragment {
 
                 TTNoteDatabase db = new TTNoteDatabase(getContext());
                 db.updateNote(note);
-                for (NoteModel noteTemp : notes) {
-                    if (note.getId() == noteTemp.getId()) {
-                        noteTemp.setTitle(note.getTitle());
-                        noteTemp.setContent(note.getContent());
-                        noteTemp.setCreatedDate(note.getCreatedDate());
-                        noteTemp.setDate(note.getDate());
-                        noteTemp.setBackground(note.getBackground());
-                        noteTemp.setStatus(note.isStatus());
-                        break;
-                    }
-                }
+//                for (NoteModel noteTemp : notes) {
+//                    if (note.getId() == noteTemp.getId()) {
+//                        noteTemp.setTitle(note.getTitle());
+//                        noteTemp.setContent(note.getContent());
+//                        noteTemp.setCreatedDate(note.getCreatedDate());
+//                        noteTemp.setDate(note.getDate());
+//                        noteTemp.setBackground(note.getBackground());
+//                        noteTemp.setStatus(note.isStatus());
+//                        break;
+//                    }
+//                }
                 notes.clear();
                 notes.addAll(db.getAllNotes());
                 noteAdapter.notifyDataSetChanged();

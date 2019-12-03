@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -31,7 +32,9 @@ public class SearchActivity extends AppCompatActivity {
     private TTNoteDatabase db;
     private Context context;
 
-    private final int UPDATE_NOTE_CODE = 6515;
+    private int requestCode;
+    private static final int UPDATE_NOTE_CODE = 6515;
+    private static final int UPDATE_TASK_NOTE_CODE = 9541;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +47,9 @@ public class SearchActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("");
         this.context = this;
         //init
+        requestCode = getIntent().getIntExtra("requestCode", UPDATE_NOTE_CODE);
         notes = new ArrayList<>();
-        noteAdapter = new NoteAdapter(notes, null);
+        noteAdapter = new NoteAdapter(notes, null, requestCode);
         btnSearch = toolbar.findViewById(R.id.btn_search);
         edtSearch = toolbar.findViewById(R.id.edt_search);
         rv = findViewById(R.id.recycler_view);
@@ -84,22 +88,31 @@ public class SearchActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == UPDATE_NOTE_CODE) {
-            Bundle bundle = data.getExtras();
-            NoteModel note = (NoteModel) bundle.getSerializable("note");
-            db.updateNote(note);
-            for (NoteModel noteTemp : notes) {
-                if (note.getId() == noteTemp.getId()) {
-                    noteTemp.setTitle(note.getTitle());
-                    noteTemp.setContent(note.getContent());
-                    noteTemp.setCreatedDate(note.getCreatedDate());
-                    noteTemp.setDate(note.getDate());
-                    noteTemp.setBackground(note.getBackground());
-                    noteTemp.setStatus(note.isStatus());
-                    break;
+        if(resultCode == Activity.RESULT_OK){
+            if (requestCode == UPDATE_NOTE_CODE) {
+                Bundle bundle = data.getExtras();
+                NoteModel note = (NoteModel) bundle.getSerializable("note");
+                db.updateNote(note);
+                for (NoteModel noteTemp : notes) {
+                    if (note.getId() == noteTemp.getId()) {
+                        noteTemp.setTitle(note.getTitle());
+                        noteTemp.setContent(note.getContent());
+                        noteTemp.setCreatedDate(note.getCreatedDate());
+                        noteTemp.setDate(note.getDate());
+                        noteTemp.setBackground(note.getBackground());
+                        noteTemp.setStatus(note.isStatus());
+                        break;
+                    }
                 }
+                noteAdapter.notifyDataSetChanged();
             }
-            noteAdapter.notifyDataSetChanged();
+            if(requestCode == UPDATE_TASK_NOTE_CODE){
+                Bundle bundle = data.getExtras();
+                NoteModel note = (NoteModel) bundle.getSerializable("note");
+                db.updateTaskNote(note);
+                searchNote();
+                noteAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -107,7 +120,10 @@ public class SearchActivity extends AppCompatActivity {
     public void searchNote(){
         String value = edtSearch.getText().toString();
         notes.clear();
-        notes.addAll(db.searchNote(value));
+        if(requestCode == UPDATE_NOTE_CODE)
+            notes.addAll(db.searchNote(value));
+        if(requestCode == UPDATE_TASK_NOTE_CODE)
+            notes.addAll(db.searchTaskNote(value));
         noteAdapter.notifyDataSetChanged();
     }
 }

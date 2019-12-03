@@ -9,7 +9,8 @@ public class TaskModel implements Serializable {
     private int noteId;
 
     public TaskModel() {
-        this.status = true;
+        id = 0;
+        this.status = false;
     }
 
     public TaskModel(String taskName, boolean status, int noteId) {

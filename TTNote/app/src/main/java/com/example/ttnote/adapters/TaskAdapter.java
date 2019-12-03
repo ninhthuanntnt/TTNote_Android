@@ -1,11 +1,15 @@
 package com.example.ttnote.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -27,12 +31,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder{
         ImageButton btnClear;
         EditText edtTaskName;
+        CheckBox cbTaskCheck;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             btnClear = itemView.findViewById(R.id.btn_clear_task);
             edtTaskName = itemView.findViewById(R.id.edt_task_name);
+            cbTaskCheck = itemView.findViewById(R.id.cb_task_check);
         }
     }
 
@@ -52,10 +58,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TaskAdapter.ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull final TaskAdapter.ViewHolder viewHolder, int position) {
         final TaskModel task = tasks.get(position);
         if(task.getTaskName() != null && !task.getTaskName().isEmpty() ){
             viewHolder.edtTaskName.setText(task.getTaskName());
+            if(task.isStatus()){
+                viewHolder.cbTaskCheck.setChecked(true);
+                viewHolder.edtTaskName.setPaintFlags(viewHolder.edtTaskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            }
+            else{
+                viewHolder.edtTaskName.setPaintFlags(viewHolder.edtTaskName.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+                viewHolder.cbTaskCheck.setChecked(false);
+            }
         }
         // set event on item
         //onclick btn clear
@@ -64,6 +78,18 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
             public void onClick(View v) {
                 tasks.remove(task);
                 notifyDataSetChanged();
+            }
+        });
+        viewHolder.cbTaskCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked == true) {
+                    viewHolder.edtTaskName.setPaintFlags(viewHolder.edtTaskName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                    task.setStatus(true);
+                }else{
+                    viewHolder.edtTaskName.setPaintFlags(viewHolder.edtTaskName.getPaintFlags() & (~ Paint.STRIKE_THRU_TEXT_FLAG));
+                    task.setStatus(false);
+                }
             }
         });
         // after change task name
