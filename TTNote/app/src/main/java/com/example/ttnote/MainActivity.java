@@ -2,7 +2,11 @@ package com.example.ttnote;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 
 import com.example.ttnote.Model.NoteModel;
@@ -31,10 +35,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-
+    TTNoteDatabase db = new TTNoteDatabase(this);
+    ArrayList<NoteModel> remindNotes;
+    ArrayList<AlarmManager> alarmManagers;
+    ArrayList<PendingIntent> pendingIntents;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,13 +58,95 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_note, R.id.nav_task, R.id.nav_slideshow,
+                R.id.nav_note, R.id.nav_task, R.id.nav_remind,
                 R.id.nav_tools, R.id.nav_share, R.id.nav_send)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        //test alarm
+        db = new TTNoteDatabase(this);
+        remindNotes = db.getAllRemindNotes();
+        alarmManagers = new ArrayList<>();
+        pendingIntents = new ArrayList<>();
+
+        for (int i = 0; i < remindNotes.size() - 1; i++) {
+            if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
+                continue;
+
+            AlarmManager alarmManagerTemp = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra("id", remindNotes.get(i).getId());
+            intent.setAction(String.valueOf(remindNotes.get(i).getId()));
+            PendingIntent pendingIntentTemp = PendingIntent.getBroadcast(this, i, intent, 0);
+            alarmManagers.add(alarmManagerTemp);
+            pendingIntents.add(pendingIntentTemp);
+            alarmManagerTemp.setExact(AlarmManager.RTC_WAKEUP, remindNotes.get(i).getDate()
+                    , pendingIntents.get(i));
+        }
+        //task
+        //1. click notification then start RemindAddition activity (v)
+        //2. update notification when close app
+        //3. multiple notification
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        for (int i = 0; i < remindNotes.size() - 1; i++) {
+            if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
+                continue;
+
+            AlarmManager alarmManagerTemp = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra("id", remindNotes.get(i).getId());
+            intent.setAction(String.valueOf(remindNotes.get(i).getId()));
+            PendingIntent pendingIntentTemp = PendingIntent.getBroadcast(this, i, intent, 0);
+            alarmManagers.add(alarmManagerTemp);
+            pendingIntents.add(pendingIntentTemp);
+            alarmManagerTemp.setExact(AlarmManager.RTC_WAKEUP, remindNotes.get(i).getDate()
+                    , pendingIntents.get(i));
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        for (int i = 0; i < remindNotes.size() - 1; i++) {
+            if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
+                continue;
+
+            AlarmManager alarmManagerTemp = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra("id", remindNotes.get(i).getId());
+            intent.setAction(String.valueOf(remindNotes.get(i).getId()));
+            PendingIntent pendingIntentTemp = PendingIntent.getBroadcast(this, i, intent, 0);
+            alarmManagers.add(alarmManagerTemp);
+            pendingIntents.add(pendingIntentTemp);
+            alarmManagerTemp.setExact(AlarmManager.RTC_WAKEUP, remindNotes.get(i).getDate()
+                    , pendingIntents.get(i));
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        for (int i = 0; i < remindNotes.size() - 1; i++) {
+            if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
+                continue;
+
+            AlarmManager alarmManagerTemp = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra("id", remindNotes.get(i).getId());
+            intent.setAction(String.valueOf(remindNotes.get(i).getId()));
+            PendingIntent pendingIntentTemp = PendingIntent.getBroadcast(this, i, intent, 0);
+            alarmManagers.add(alarmManagerTemp);
+            pendingIntents.add(pendingIntentTemp);
+            alarmManagerTemp.setExact(AlarmManager.RTC_WAKEUP, remindNotes.get(i).getDate()
+                    , pendingIntents.get(i));
+        }
     }
 
     @Override

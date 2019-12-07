@@ -3,28 +3,21 @@ package com.example.ttnote;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.drawable.DrawableCompat;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.ttnote.Model.NoteModel;
-import com.example.ttnote.database.TTNoteDatabase;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomnavigation.LabelVisibilityMode;
 import com.google.android.material.button.MaterialButton;
@@ -35,9 +28,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import petrov.kristiyan.colorpicker.ColorPicker;
-import yuku.ambilwarna.AmbilWarnaDialog;
 
-public class NoteAdditionActivity extends AppCompatActivity {
+public class RemindNoteAdditionActivity extends AppCompatActivity {
 
     private BottomNavigationView navBottom;
     private MaterialButton btnAdd;
@@ -45,11 +37,15 @@ public class NoteAdditionActivity extends AppCompatActivity {
     private EditText edtContent;
     private EditText edtTitle;
     private NoteModel note;
+    private Calendar scheduleNote;
+    private Calendar calendar;
+
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_note_addition);
+        setContentView(R.layout.activity_remind_note_addition);
         Toolbar toolbar = findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -62,10 +58,16 @@ public class NoteAdditionActivity extends AppCompatActivity {
         edtTitle = findViewById(R.id.edt_title);
         edtContent = findViewById(R.id.edt_content);
         note = new NoteModel();
-        Intent intent = getIntent();
+        scheduleNote = Calendar.getInstance();
+        scheduleNote.add(Calendar.DAY_OF_MONTH, 1);
+        intent = getIntent();
+        calendar = Calendar.getInstance();
 
+        //get remind note to update if can
         try{
             NoteModel currentNote = (NoteModel) intent.getExtras().getSerializable("note");
+            scheduleNote.setTimeInMillis(currentNote.getDate());
+            calendar.setTimeInMillis(currentNote.getDate());
             note = currentNote;
 
             edtTitle.setText(currentNote.getTitle());
@@ -77,13 +79,40 @@ public class NoteAdditionActivity extends AppCompatActivity {
 
         }
 
-
-
         navBottom.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED);
         navBottom.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
+                    // choose date
+                    case R.id.navigation_calender:
+                        int year = calendar.get(Calendar.YEAR);
+                        final int month = calendar.get(Calendar.MONTH);
+                        int day = calendar.get(Calendar.DAY_OF_MONTH);
+                        DatePickerDialog datePickerDialog = new DatePickerDialog(RemindNoteAdditionActivity.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                                scheduleNote.set(year, monthOfYear, dayOfMonth);
+                                calendar.set(year, monthOfYear, dayOfMonth);
+                            }
+                        }, year, month, day);
+                        datePickerDialog.show();
+                        return true;
+//                    // choose time
+                    case R.id.navigation_time:
+                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                        final int minute = calendar.get(Calendar.MINUTE);
+                        TimePickerDialog timePickerDialog = new TimePickerDialog(RemindNoteAdditionActivity.this, new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker timePicker, int hour, int minutes) {
+                                scheduleNote.set(Calendar.HOUR_OF_DAY, hour);
+                                scheduleNote.set(Calendar.MINUTE, minutes);
+                                calendar.set(Calendar.HOUR_OF_DAY, hour);
+                                calendar.set(Calendar.MINUTE, minutes);
+                            }
+                        }, hour, minute, true);
+                        timePickerDialog.show();
+                        return true;
                     // choose color
                     case R.id.navigation_color:
                         openColorPicker();
@@ -102,7 +131,6 @@ public class NoteAdditionActivity extends AppCompatActivity {
                 return false;
             }
         });
-
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -111,6 +139,7 @@ public class NoteAdditionActivity extends AppCompatActivity {
                 if (!edtTitle.getText().toString().isEmpty() && !edtContent.getText().toString().isEmpty()) {
                     note.setTitle(edtTitle.getText().toString());
                     note.setContent(edtContent.getText().toString());
+                    note.setDate(scheduleNote.getTimeInMillis());
 
                     Intent intent = getIntent();
                     Bundle bundle = new Bundle();
@@ -119,7 +148,7 @@ public class NoteAdditionActivity extends AppCompatActivity {
                     setResult(Activity.RESULT_OK, intent);
                     finish();
                 } else {
-                    Toast.makeText(NoteAdditionActivity.this, "Please fill complete", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RemindNoteAdditionActivity.this, "Please fill complete", Toast.LENGTH_LONG).show();
                 }
             }
         });

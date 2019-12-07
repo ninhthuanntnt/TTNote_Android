@@ -19,8 +19,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.ttnote.Model.NoteModel;
 import com.example.ttnote.NoteAdditionActivity;
 import com.example.ttnote.R;
+import com.example.ttnote.RemindNoteAdditionActivity;
 import com.example.ttnote.TaskNoteAdditionActivity;
 import com.example.ttnote.ui.home.HomeFragment;
+import com.example.ttnote.ui.remind.RemindFragment;
 import com.example.ttnote.ui.task.TaskFragment;
 
 import java.text.SimpleDateFormat;
@@ -36,6 +38,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
 
     private static final int UPDATE_NOTE_CODE = 6515;
     private static final int UPDATE_TASK_NOTE_CODE = 9541;
+    private static final int UPDATE_REMIND_NOTE_CODE = 6012;
 
     public NoteAdapter(ArrayList<NoteModel> notes, Fragment fragment, int updateCode) {
         this.notes = notes;
@@ -77,7 +80,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
         viewHolder.tvContent.setText(note.getContent());
 
         Date createdDate = new Date(note.getCreatedDate());
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:ss a");
+        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:ss a");
 
         viewHolder.tvCreatedDate.setText(format.format(createdDate));
 
@@ -95,6 +98,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
                     intent = new Intent(context, NoteAdditionActivity.class);
                 if(updateCode == UPDATE_TASK_NOTE_CODE)
                     intent = new Intent(context, TaskNoteAdditionActivity.class);
+                if(updateCode == UPDATE_REMIND_NOTE_CODE)
+                    intent = new Intent(context, RemindNoteAdditionActivity.class);
 
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("note",notes.get(position));
@@ -105,6 +110,8 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
                         fragment.startActivityForResult(intent, UPDATE_NOTE_CODE);
                     if(fragment instanceof TaskFragment)
                         fragment.startActivityForResult(intent, UPDATE_TASK_NOTE_CODE);
+                    if(fragment instanceof RemindFragment)
+                        fragment.startActivityForResult(intent, UPDATE_REMIND_NOTE_CODE);
                 }else{
                     ((Activity) context).startActivityForResult(intent, updateCode);
                 }

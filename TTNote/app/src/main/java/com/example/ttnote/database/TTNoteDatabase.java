@@ -65,13 +65,31 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
             note.setBackground(cursor.getInt(5));
             note.setStatus(!(cursor.getInt(6) == 0));
 
-            ArrayList<TaskModel> tasks = getTasksByNoteId(note.getId());
-            note.setTasks(tasks);
             notes.add(note);
             cursor.moveToNext();
         }
         cursor.close();
         return notes;
+    }
+
+    public NoteModel getNoteById(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        NoteModel note = new NoteModel();
+        Cursor cursor = db.rawQuery(" SELECT * FROM note WHERE id = ?", new String[]{String.valueOf(id)});
+
+        cursor.moveToFirst();
+        // 1: id, 2:title, 3: content, 4: created_date, 5: date, 6: background, 7: status
+        note.setId(cursor.getInt(0));
+        note.setTitle(cursor.getString(1));
+        note.setContent(cursor.getString(2));
+        note.setCreatedDate(cursor.getLong(3));
+        note.setDate(cursor.getLong(4));
+        note.setBackground(cursor.getInt(5));
+        note.setStatus(!(cursor.getInt(6) == 0));
+
+
+        cursor.close();
+        return note;
     }
 
     public long addNote(NoteModel note) {
@@ -111,11 +129,11 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
         ArrayList<NoteModel> notes = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM note LEFT OUTER JOIN task " +
-                                        " ON note.id = task.note_id " +
-                                        " WHERE note.date = 0 " +
-                                        " AND task.note_id IS NULL " +
-                                        " AND (note.title LIKE ? OR note.content LIKE ?) " +
-                                        " AND note.status = 1 ", new String[]{value, value});
+                " ON note.id = task.note_id " +
+                " WHERE note.date = 0 " +
+                " AND task.note_id IS NULL " +
+                " AND (note.title LIKE ? OR note.content LIKE ?) " +
+                " AND note.status = 1 ", new String[]{value, value});
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -141,11 +159,11 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
         ArrayList<NoteModel> notes = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(" SELECT note.* FROM note JOIN task " +
-                                        " ON note.id = task.note_id " +
-                                        " WHERE note.date = 0 " +
-                                        " AND (note.title LIKE ? OR note.content LIKE ? OR task.task_name LIKE ?) " +
-                                        " AND note.status = 1 "
-                    , new String[]{value, value, value});
+                        " ON note.id = task.note_id " +
+                        " WHERE note.date = 0 " +
+                        " AND (note.title LIKE ? OR note.content LIKE ? OR task.task_name LIKE ?) " +
+                        " AND note.status = 1 "
+                , new String[]{value, value, value});
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -163,7 +181,7 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
 
-        for (NoteModel noteTemp : notes){
+        for (NoteModel noteTemp : notes) {
             noteTemp.setTasks(this.getTasksByNoteId(noteTemp.getId()));
         }
         cursor.close();
@@ -179,7 +197,7 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public void addTask(TaskModel task){
+    public void addTask(TaskModel task) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues value = new ContentValues();
         value.put("task_name", task.getTaskName());
@@ -190,22 +208,11 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
 
     public void updateTaskNote(NoteModel note) {
         SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues value = new ContentValues();
-        value.put("title", note.getTitle());
-        value.put("content", note.getContent());
-        value.put("created_date", note.getCreatedDate());
-        value.put("date", note.getDate());
-        value.put("background", note.getBackground());
-        if ((note.isStatus())) {
-            value.put("status", 1);
-        } else {
-            value.put("status", 0);
-        }
-        db.update("note", value, "id = ? ", new String[]{String.valueOf(note.getId())});
+        this.updateNote(note);
         //update the tasks
         for (TaskModel task : note.getTasks()) {
             //check if task doesn't exist
-            if(task.getId() == 0){
+            if (task.getId() == 0) {
                 task.setNoteId(note.getId());
                 this.addTask(task);
                 continue;
@@ -265,6 +272,62 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
             noteTemp.setTasks(this.getTasksByNoteId(noteTemp.getId()));
         }
 
+        return notes;
+    }
+
+    public ArrayList<NoteModel> getAllRemindNotes() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ArrayList<NoteModel> notes = new ArrayList<>();
+        Cursor cursor = db.rawQuery(" SELECT note.* FROM note LEFT OUTER JOIN task " +
+                " ON note.id = task.note_id " +
+                " WHERE date != 0 AND task.note_id IS NULL AND note.status = 1", null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            NoteModel note = new NoteModel();
+            // 1: id, 2:title, 3: content, 4: created_date, 5: date, 6: background, 7: status
+            note.setId(cursor.getInt(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(cursor.getString(2));
+            note.setCreatedDate(cursor.getLong(3));
+            note.setDate(cursor.getLong(4));
+            note.setBackground(cursor.getInt(5));
+            note.setStatus(!(cursor.getInt(6) == 0));
+
+            notes.add(note);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return notes;
+    }
+
+    public ArrayList<NoteModel> searchRemindNote(String value) {
+        value = "%" + value + "%";
+        ArrayList<NoteModel> notes = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM note LEFT OUTER JOIN task " +
+                " ON note.id = task.note_id " +
+                " WHERE note.date != 0 " +
+                " AND task.note_id IS NULL " +
+                " AND (note.title LIKE ? OR note.content LIKE ?) " +
+                " AND note.status = 1 ", new String[]{value, value});
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            NoteModel note = new NoteModel();
+            // 1: id, 2:title, 3: content, 4: created_date, 5: date, 6: background, 7: status
+            note.setId(cursor.getInt(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(cursor.getString(2));
+            note.setCreatedDate(cursor.getLong(3));
+            note.setDate(cursor.getLong(4));
+            note.setBackground(cursor.getInt(5));
+            note.setStatus(!(cursor.getInt(6) == 0));
+
+            notes.add(note);
+            cursor.moveToNext();
+        }
+        cursor.close();
         return notes;
     }
 }

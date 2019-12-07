@@ -18,8 +18,8 @@
         tools:layout="@layout/fragment_task" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.ttnote.ui.slideshow.SlideshowFragment"
+        android:id="@+id/nav_remind"
+        android:name="com.example.ttnote.ui.remind.RemindFragment"
         android:label="@string/menu_remind"
         tools:layout="@layout/fragment_remind" />
 

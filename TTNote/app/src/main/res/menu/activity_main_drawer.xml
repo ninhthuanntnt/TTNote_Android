@@ -13,7 +13,7 @@ tools:showIn="navigation_view">
         android:icon="@drawable/ic_mission"
         android:title="@string/menu_task" />
     <item
-        android:id="@+id/nav_slideshow"
+        android:id="@+id/nav_remind"
         android:icon="@drawable/ic_remind"
         android:title="@string/menu_remind" />
     <item

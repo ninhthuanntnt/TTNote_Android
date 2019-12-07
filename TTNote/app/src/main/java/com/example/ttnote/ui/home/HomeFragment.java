@@ -37,6 +37,7 @@ public class HomeFragment extends Fragment {
     private RecyclerView rvNoteList;
     private TTNoteDatabase db;
     private FloatingActionButton btnAdd;
+
     public static final int ADD_NOTE_CODE = 1002;
     public static final int UPDATE_NOTE_CODE = 6515;
     public static final int SEARCH_NOTE_CODE = 5621;
@@ -52,16 +53,8 @@ public class HomeFragment extends Fragment {
         rvNoteList = root.findViewById(R.id.rv_note_list);
         btnAdd = root.findViewById(R.id.btn_add);
         notes = db.getAllNotes();
-        //note filter
-        ArrayList<NoteModel> notesTemp = new ArrayList<>();
-        for(int i=0 ; i < notes.size(); i++){
-            if(notes.get(i).getTasks().isEmpty()){
-                notesTemp.add(notes.get(i));
-            }
-        }
-        notes = notesTemp;
 
-        //set adapter to list view
+        //set adapter to recycler view
         noteAdapter = new NoteAdapter(notes, this, UPDATE_NOTE_CODE);
         rvNoteList.setAdapter(noteAdapter);
         rvNoteList.setLayoutManager(new LinearLayoutManager(root.getContext()));
@@ -71,7 +64,6 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), NoteAdditionActivity.class);
-//                getActivity().startActivityForResult(intent, ADD_NOTE_CODE);
                 startActivityForResult(intent, ADD_NOTE_CODE);
             }
         });

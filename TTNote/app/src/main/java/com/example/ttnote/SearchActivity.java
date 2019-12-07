@@ -35,6 +35,7 @@ public class SearchActivity extends AppCompatActivity {
     private int requestCode;
     private static final int UPDATE_NOTE_CODE = 6515;
     private static final int UPDATE_TASK_NOTE_CODE = 9541;
+    private static final int UPDATE_REMIND_NOTE_CODE = 6012;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +90,7 @@ public class SearchActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == Activity.RESULT_OK){
-            if (requestCode == UPDATE_NOTE_CODE) {
+            if (requestCode == UPDATE_NOTE_CODE || requestCode == UPDATE_REMIND_NOTE_CODE) {
                 Bundle bundle = data.getExtras();
                 NoteModel note = (NoteModel) bundle.getSerializable("note");
                 db.updateNote(note);
@@ -124,6 +125,8 @@ public class SearchActivity extends AppCompatActivity {
             notes.addAll(db.searchNote(value));
         if(requestCode == UPDATE_TASK_NOTE_CODE)
             notes.addAll(db.searchTaskNote(value));
+        if(requestCode == UPDATE_REMIND_NOTE_CODE)
+            notes.addAll(db.searchRemindNote(value));
         noteAdapter.notifyDataSetChanged();
     }
 }
