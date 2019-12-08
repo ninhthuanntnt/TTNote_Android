@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
-        //test alarm
+        // set notification
         db = new TTNoteDatabase(this);
         remindNotes = db.getAllRemindNotes();
         alarmManagers = new ArrayList<>();
@@ -99,6 +99,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
 
+        // set notification
+        db = new TTNoteDatabase(this);
+        remindNotes = db.getAllRemindNotes();
+        alarmManagers = new ArrayList<>();
+        pendingIntents = new ArrayList<>();
+
         for (int i = 0, j = 0; i < remindNotes.size(); i++) {
             if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
                 continue;
@@ -122,6 +128,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+        // set notification
+        db = new TTNoteDatabase(this);
+        remindNotes = db.getAllRemindNotes();
+        alarmManagers = new ArrayList<>();
+        pendingIntents = new ArrayList<>();
+
         for (int i = 0, j = 0; i < remindNotes.size(); i++) {
             if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
                 continue;
@@ -144,6 +156,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // set notification
+        db = new TTNoteDatabase(this);
+        remindNotes = db.getAllRemindNotes();
+        alarmManagers = new ArrayList<>();
+        pendingIntents = new ArrayList<>();
 
         for (int i = 0, j = 0; i < remindNotes.size(); i++) {
             if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())

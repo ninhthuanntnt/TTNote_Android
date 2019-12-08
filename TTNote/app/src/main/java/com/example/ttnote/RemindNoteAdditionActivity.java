@@ -9,10 +9,12 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -33,8 +35,7 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private BottomNavigationView navBottom;
-    private MaterialButton btnAdd;
-    private ScrollView llCardContainer;
+    private LinearLayout llCardContainer;
     private EditText edtContent;
     private EditText edtTitle;
     private NoteModel note;
@@ -54,7 +55,6 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
 
         //init
         navBottom = findViewById(R.id.nav_bottom);
-        btnAdd = findViewById(R.id.btn_add);
         llCardContainer = findViewById(R.id.ll_card_container);
         edtTitle = findViewById(R.id.edt_title);
         edtContent = findViewById(R.id.edt_content);
@@ -73,7 +73,6 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
 
             edtTitle.setText(currentNote.getTitle());
             edtContent.setText(currentNote.getContent());
-            btnAdd.setText("SAVE");
             llCardContainer.setBackgroundColor(currentNote.getBackground());
             toolbar.setBackgroundColor(currentNote.getBackground());
         }catch (NullPointerException ex){
@@ -132,9 +131,9 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
                 return false;
             }
         });
-        btnAdd.setOnClickListener(new View.OnClickListener() {
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onMenuItemClick(MenuItem item) {
                 note.setCreatedDate((new Date()).getTime());
 
                 if (!edtTitle.getText().toString().isEmpty() && !edtContent.getText().toString().isEmpty()) {
@@ -151,6 +150,7 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(RemindNoteAdditionActivity.this, "Please fill complete", Toast.LENGTH_LONG).show();
                 }
+                return true;
             }
         });
     }
@@ -158,6 +158,12 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.addition_toolbar, menu);
         return true;
     }
 
@@ -173,7 +179,6 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
 
             edtTitle.setText(currentNote.getTitle());
             edtContent.setText(currentNote.getContent());
-            btnAdd.setText("SAVE");
             llCardContainer.setBackgroundColor(currentNote.getBackground());
             toolbar.setBackgroundColor(currentNote.getBackground());
         }catch (NullPointerException ex){

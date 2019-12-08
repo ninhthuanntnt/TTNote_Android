@@ -9,9 +9,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
@@ -33,9 +35,8 @@ public class TaskNoteAdditionActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private BottomNavigationView navBottom;
-    private MaterialButton btnAdd;
     private MaterialButton btnAddTask;
-    private ScrollView llCardContainer;
+    private LinearLayout llCardContainer;
     private EditText edtContent;
     private EditText edtTitle;
     private NoteModel note;
@@ -57,7 +58,6 @@ public class TaskNoteAdditionActivity extends AppCompatActivity {
 
         //init
         navBottom = findViewById(R.id.nav_bottom);
-        btnAdd = findViewById(R.id.btn_add);
         btnAddTask = findViewById(R.id.btn_add_task);
         llCardContainer = findViewById(R.id.ll_card_container);
         edtTitle = findViewById(R.id.edt_title);
@@ -82,7 +82,6 @@ public class TaskNoteAdditionActivity extends AppCompatActivity {
 
             edtTitle.setText(currentNote.getTitle());
             edtContent.setText(currentNote.getContent());
-            btnAdd.setText("SAVE");
             llCardContainer.setBackgroundColor(currentNote.getBackground());
             toolbar.setBackgroundColor(currentNote.getBackground());
         }catch (NullPointerException ex){
@@ -98,9 +97,9 @@ public class TaskNoteAdditionActivity extends AppCompatActivity {
                 taskAdapter.notifyDataSetChanged();
             }
         });
-        btnAdd.setOnClickListener(new View.OnClickListener() {
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onMenuItemClick(MenuItem item) {
                 note.setCreatedDate((new Date()).getTime());
 
                 if (!edtTitle.getText().toString().isEmpty() && !edtContent.getText().toString().isEmpty()) {
@@ -116,15 +115,14 @@ public class TaskNoteAdditionActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(TaskNoteAdditionActivity.this, "Please fill complete", Toast.LENGTH_LONG).show();
                 }
+                return true;
             }
         });
-
 
         navBottom.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED);
         navBottom.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                Calendar calendar = Calendar.getInstance();
                 switch (menuItem.getItemId()) {
                     case R.id.navigation_color:
                         openColorPicker();
@@ -150,6 +148,11 @@ public class TaskNoteAdditionActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.addition_toolbar, menu);
+        return true;
+    }
 
     public void openColorPicker() {
         final ColorPicker colorPicker = new ColorPicker(this);

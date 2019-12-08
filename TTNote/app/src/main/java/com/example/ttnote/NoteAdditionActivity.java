@@ -3,46 +3,32 @@ package com.example.ttnote;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.graphics.drawable.DrawableCompat;
 
 import android.app.Activity;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.InsetDrawable;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.ttnote.Model.NoteModel;
-import com.example.ttnote.database.TTNoteDatabase;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomnavigation.LabelVisibilityMode;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import petrov.kristiyan.colorpicker.ColorPicker;
-import yuku.ambilwarna.AmbilWarnaDialog;
 
 public class NoteAdditionActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private BottomNavigationView navBottom;
-    private MaterialButton btnAdd;
-    private ScrollView llCardContainer;
+    private LinearLayout llCardContainer;
     private EditText edtContent;
     private EditText edtTitle;
     private NoteModel note;
@@ -55,29 +41,25 @@ public class NoteAdditionActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
         //init
         navBottom = findViewById(R.id.nav_bottom);
-        btnAdd = findViewById(R.id.btn_add);
         llCardContainer = findViewById(R.id.ll_card_container);
         edtTitle = findViewById(R.id.edt_title);
         edtContent = findViewById(R.id.edt_content);
         note = new NoteModel();
         Intent intent = getIntent();
 
-        try{
+        try {
             NoteModel currentNote = (NoteModel) intent.getExtras().getSerializable("note");
             note = currentNote;
 
             edtTitle.setText(currentNote.getTitle());
             edtContent.setText(currentNote.getContent());
-            btnAdd.setText("SAVE");
             llCardContainer.setBackgroundColor(currentNote.getBackground());
             toolbar.setBackgroundColor(currentNote.getBackground());
-        }catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
 
         }
-
 
 
         navBottom.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED);
@@ -104,9 +86,9 @@ public class NoteAdditionActivity extends AppCompatActivity {
             }
         });
 
-        btnAdd.setOnClickListener(new View.OnClickListener() {
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onClick(View view) {
+            public boolean onMenuItemClick(MenuItem item) {
                 note.setCreatedDate((new Date()).getTime());
 
                 if (!edtTitle.getText().toString().isEmpty() && !edtContent.getText().toString().isEmpty()) {
@@ -122,6 +104,7 @@ public class NoteAdditionActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(NoteAdditionActivity.this, "Please fill complete", Toast.LENGTH_LONG).show();
                 }
+                return true;
             }
         });
     }
@@ -129,6 +112,12 @@ public class NoteAdditionActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.addition_toolbar, menu);
         return true;
     }
 
@@ -155,7 +144,7 @@ public class NoteAdditionActivity extends AppCompatActivity {
                 .setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
                     @Override
                     public void onChooseColor(int position, int color) {
-                        if(color == 0)
+                        if (color == 0)
                             color = -1;
                         note.setBackground(color);
                         llCardContainer.setBackgroundColor(color);

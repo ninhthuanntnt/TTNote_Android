@@ -1,15 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-<!--        <item-->
-<!--            android:id="@+id/navigation_calender"-->
-<!--            android:icon="@drawable/ic_calender"-->
-<!--            android:title="Date"/>-->
-
-<!--        <item-->
-<!--            android:id="@+id/navigation_time"-->
-<!--            android:icon="@drawable/ic_clock"-->
-<!--            android:title="Time"/>-->
-
         <item
             android:id="@+id/navigation_color"
             android:icon="@drawable/ic_painter_palette"

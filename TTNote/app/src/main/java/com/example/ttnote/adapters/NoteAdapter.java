@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ttnote.Model.NoteModel;
+import com.example.ttnote.Model.TaskModel;
 import com.example.ttnote.NoteAdditionActivity;
 import com.example.ttnote.R;
 import com.example.ttnote.RemindNoteAdditionActivity;
@@ -24,6 +26,7 @@ import com.example.ttnote.TaskNoteAdditionActivity;
 import com.example.ttnote.ui.home.HomeFragment;
 import com.example.ttnote.ui.remind.RemindFragment;
 import com.example.ttnote.ui.task.TaskFragment;
+import com.google.android.material.card.MaterialCardView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,11 +49,11 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
         this.updateCode = updateCode;
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvTitle;
         private TextView tvContent;
         private TextView tvCreatedDate;
-        private LinearLayout llCard;
+        private MaterialCardView cardView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -58,7 +61,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvContent = itemView.findViewById(R.id.tv_content);
             tvCreatedDate = itemView.findViewById(R.id.tv_created_date);
-            llCard = itemView.findViewById(R.id.ll_card);
+            cardView = itemView.findViewById(R.id.card_view);
         }
     }
 
@@ -77,46 +80,64 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, final int position) {
         final NoteModel note = notes.get(position);
         viewHolder.tvTitle.setText(note.getTitle());
-        viewHolder.tvContent.setText(note.getContent());
-
+        if (note.getContent().length() > 100)
+            viewHolder.tvContent.setText(note.getContent().substring(0, 99) + "...");
+        else
+            viewHolder.tvContent.setText(note.getContent());
         final Date createdDate = new Date(note.getCreatedDate());
-        final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:ss a");
+        final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
         viewHolder.tvCreatedDate.setText(format.format(createdDate));
 
-        Drawable cardItemBorder = DrawableCompat.wrap(context.getResources().getDrawable(R.drawable.card_view_border));
-        DrawableCompat.setTint(cardItemBorder, note.getBackground());
-        viewHolder.llCard.setBackground(cardItemBorder);
-        if(updateCode == UPDATE_REMIND_NOTE_CODE){
+        viewHolder.cardView.setCardBackgroundColor(note.getBackground());
+        if (updateCode == UPDATE_REMIND_NOTE_CODE) {
             String remindDate = format.format(new Date(note.getDate()));
-            viewHolder.tvCreatedDate.setText(format.format(createdDate) + "  |  " +
-                    "REMIND YOU AT "  + remindDate);
+            viewHolder.tvCreatedDate.setText(format.format(createdDate) + "  |  " + "REMIND YOU AT " + remindDate);
+        }
+        if(updateCode == UPDATE_TASK_NOTE_CODE){
+            StringBuilder content = new StringBuilder();
+            if(note.getContent().length() > 50){
+                content.append(note.getContent().substring(0,50) + "...");
+            }else{
+                content.append(note.getContent());
+            }
+            content.append("\n");
+            for(TaskModel taskTemp : note.getTasks()){
+                if(taskTemp.isStatus()){
+                    content.append(" \u2713 " + taskTemp.getTaskName());
+                }else{
+                    content.append("✗ " + taskTemp.getTaskName());
+                }
+                content.append("\n");
+            }
+
+            viewHolder.tvContent.setText(content);
         }
         //event
-        viewHolder.llCard.setOnClickListener(new View.OnClickListener() {
+        viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = null;
 
                 if (updateCode == UPDATE_NOTE_CODE)
                     intent = new Intent(context, NoteAdditionActivity.class);
-                if(updateCode == UPDATE_TASK_NOTE_CODE)
+                if (updateCode == UPDATE_TASK_NOTE_CODE)
                     intent = new Intent(context, TaskNoteAdditionActivity.class);
-                if(updateCode == UPDATE_REMIND_NOTE_CODE)
+                if (updateCode == UPDATE_REMIND_NOTE_CODE)
                     intent = new Intent(context, RemindNoteAdditionActivity.class);
 
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("note",notes.get(position));
+                bundle.putSerializable("note", notes.get(position));
                 intent.putExtras(bundle);
 
-                if(fragment != null) {
-                    if(fragment instanceof HomeFragment)
+                if (fragment != null) {
+                    if (fragment instanceof HomeFragment)
                         fragment.startActivityForResult(intent, UPDATE_NOTE_CODE);
-                    if(fragment instanceof TaskFragment)
+                    if (fragment instanceof TaskFragment)
                         fragment.startActivityForResult(intent, UPDATE_TASK_NOTE_CODE);
-                    if(fragment instanceof RemindFragment)
+                    if (fragment instanceof RemindFragment)
                         fragment.startActivityForResult(intent, UPDATE_REMIND_NOTE_CODE);
-                }else{
+                } else {
                     ((Activity) context).startActivityForResult(intent, updateCode);
                 }
             }
@@ -127,7 +148,6 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     public int getItemCount() {
         return notes.size();
     }
-
 
 
 }
