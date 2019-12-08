@@ -27,7 +27,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         NoteModel remindNote = db.getNoteById(id);
         NotificationHelper notificationHelper = new NotificationHelper(context);
         NotificationCompat.Builder nb = notificationHelper.getChannelNotification(remindNote);
-        notificationHelper.getManager().notify(1, nb.build());
+        nb.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
+        notificationHelper.getManager().notify( (int) System.currentTimeMillis(), nb.build());
 
 //        Uri alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 //        if (alarmUri == null) {

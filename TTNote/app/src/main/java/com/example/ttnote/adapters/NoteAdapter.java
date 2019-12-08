@@ -74,20 +74,24 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, final int position) {
         final NoteModel note = notes.get(position);
         viewHolder.tvTitle.setText(note.getTitle());
         viewHolder.tvContent.setText(note.getContent());
 
-        Date createdDate = new Date(note.getCreatedDate());
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:ss a");
+        final Date createdDate = new Date(note.getCreatedDate());
+        final SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:ss a");
 
         viewHolder.tvCreatedDate.setText(format.format(createdDate));
 
         Drawable cardItemBorder = DrawableCompat.wrap(context.getResources().getDrawable(R.drawable.card_view_border));
         DrawableCompat.setTint(cardItemBorder, note.getBackground());
         viewHolder.llCard.setBackground(cardItemBorder);
-
+        if(updateCode == UPDATE_REMIND_NOTE_CODE){
+            String remindDate = format.format(new Date(note.getDate()));
+            viewHolder.tvCreatedDate.setText(format.format(createdDate) + "  |  " +
+                    "REMIND YOU AT "  + remindDate);
+        }
         //event
         viewHolder.llCard.setOnClickListener(new View.OnClickListener() {
             @Override

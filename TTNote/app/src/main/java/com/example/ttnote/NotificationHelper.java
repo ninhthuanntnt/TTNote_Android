@@ -47,6 +47,7 @@ public class NotificationHelper extends ContextWrapper {
         Bundle bundle = new Bundle();
         bundle.putSerializable("note", remindNote);
         resultIntent.putExtras(bundle);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, remindNote.getId(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         return new NotificationCompat.Builder(getApplicationContext(), channelID)
                 .setContentTitle(remindNote.getTitle())

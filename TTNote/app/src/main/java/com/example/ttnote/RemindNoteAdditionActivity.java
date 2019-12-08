@@ -31,6 +31,7 @@ import petrov.kristiyan.colorpicker.ColorPicker;
 
 public class RemindNoteAdditionActivity extends AppCompatActivity {
 
+    private Toolbar toolbar;
     private BottomNavigationView navBottom;
     private MaterialButton btnAdd;
     private ScrollView llCardContainer;
@@ -46,7 +47,7 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_remind_note_addition);
-        Toolbar toolbar = findViewById(R.id.tool_bar);
+        toolbar = findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -160,26 +161,54 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Toolbar toolbar = findViewById(R.id.tool_bar);
+        try{
+            NoteModel currentNote = (NoteModel) intent.getExtras().getSerializable("note");
+            scheduleNote.setTimeInMillis(currentNote.getDate());
+            calendar.setTimeInMillis(currentNote.getDate());
+            note = currentNote;
+
+            edtTitle.setText(currentNote.getTitle());
+            edtContent.setText(currentNote.getContent());
+            btnAdd.setText("SAVE");
+            llCardContainer.setBackgroundColor(currentNote.getBackground());
+            toolbar.setBackgroundColor(currentNote.getBackground());
+        }catch (NullPointerException ex){
+
+        }
+    }
+
     public void openColorPicker() {
         final ColorPicker colorPicker = new ColorPicker(this);
         ArrayList<String> colors = new ArrayList<>();
-        colors.add("#eb8360");
-        colors.add("#eba660");
-        colors.add("#eeee77");
-        colors.add("#71e949");
-        colors.add("#49e9e9");
-        colors.add("#4949e9");
-        colors.add("#ee77b3");
+        colors.add("#ffff80");
+        colors.add("#ffbf80");
+        colors.add("#ff8080");
+        colors.add("#ff80ff");
+        colors.add("#bf80ff");
+        colors.add("#809fff");
+        colors.add("#80d4ff");
+        colors.add("#80ff9f");
+        colors.add("#bfff80");
+        colors.add("#dfff80");
+        colors.add("#bd8e8e");
         colors.add("#ffffff");
 
         colorPicker.setColors(colors)
-                .setColumns(4)
+                .setColumns(5)
                 .setRoundColorButton(true)
+                .setDefaultColorButton(-1)
                 .setOnChooseColorListener(new ColorPicker.OnChooseColorListener() {
                     @Override
                     public void onChooseColor(int position, int color) {
+                        if(color == 0)
+                            color = -1;
                         note.setBackground(color);
                         llCardContainer.setBackgroundColor(color);
+                        toolbar.setBackgroundColor(color);
                     }
 
                     @Override

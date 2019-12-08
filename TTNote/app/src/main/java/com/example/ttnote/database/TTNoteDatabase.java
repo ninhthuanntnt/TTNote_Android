@@ -14,8 +14,8 @@ import java.util.ArrayList;
 
 public class TTNoteDatabase extends SQLiteOpenHelper {
 
-    private static final int VERSION = 1;
-    public static final String DATABASE_NAME = "TTNoteDB";
+    private static final int VERSION = 2;
+    public static final String DATABASE_NAME = "NTNoteDB";
     public static final String NOTE_TABLE_NAME = "note";
     public static final String TASK_TABLE_NAME = "task";
 

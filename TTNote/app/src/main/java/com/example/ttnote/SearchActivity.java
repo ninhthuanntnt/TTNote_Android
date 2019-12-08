@@ -7,13 +7,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -22,10 +27,11 @@ import com.example.ttnote.adapters.NoteAdapter;
 import com.example.ttnote.database.TTNoteDatabase;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class SearchActivity extends AppCompatActivity {
     private EditText edtSearch;
-    private ImageView btnSearch;
+    private ImageButton btnVoice;
     private RecyclerView rv;
     private ArrayList<NoteModel> notes;
     private NoteAdapter noteAdapter;
@@ -36,6 +42,7 @@ public class SearchActivity extends AppCompatActivity {
     private static final int UPDATE_NOTE_CODE = 6515;
     private static final int UPDATE_TASK_NOTE_CODE = 9541;
     private static final int UPDATE_REMIND_NOTE_CODE = 6012;
+    private static final int SPEECH_INPUT_CODE = 1111;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +58,8 @@ public class SearchActivity extends AppCompatActivity {
         requestCode = getIntent().getIntExtra("requestCode", UPDATE_NOTE_CODE);
         notes = new ArrayList<>();
         noteAdapter = new NoteAdapter(notes, null, requestCode);
-        btnSearch = toolbar.findViewById(R.id.btn_search);
         edtSearch = toolbar.findViewById(R.id.edt_search);
+        btnVoice = toolbar.findViewById(R.id.btn_voice);
         rv = findViewById(R.id.recycler_view);
         edtSearch.requestFocus();
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
@@ -61,12 +68,6 @@ public class SearchActivity extends AppCompatActivity {
         rv.setLayoutManager(new LinearLayoutManager(this));
         db = new TTNoteDatabase(this);
         // Event
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchNote();
-            }
-        });
         edtSearch.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -76,6 +77,28 @@ public class SearchActivity extends AppCompatActivity {
 //                    return true;
                 }
                 return false;
+            }
+        });
+        edtSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                searchNote();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        btnVoice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                promptSpeechInput();
             }
         });
     }
@@ -114,6 +137,11 @@ public class SearchActivity extends AppCompatActivity {
                 searchNote();
                 noteAdapter.notifyDataSetChanged();
             }
+            if(requestCode == SPEECH_INPUT_CODE){
+                ArrayList<String> result = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                edtSearch.setText(result.get(0));
+            }
         }
     }
 
@@ -128,5 +156,21 @@ public class SearchActivity extends AppCompatActivity {
         if(requestCode == UPDATE_REMIND_NOTE_CODE)
             notes.addAll(db.searchRemindNote(value));
         noteAdapter.notifyDataSetChanged();
+    }
+
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+                "Say something…");
+        try {
+            startActivityForResult(intent, SPEECH_INPUT_CODE);
+        } catch (ActivityNotFoundException a) {
+            Toast.makeText(getApplicationContext(),
+                    "Sorry! Your device doesn\'t support speech input",
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 }

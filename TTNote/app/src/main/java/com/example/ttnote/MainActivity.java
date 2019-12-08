@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<NoteModel> remindNotes;
     ArrayList<AlarmManager> alarmManagers;
     ArrayList<PendingIntent> pendingIntents;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         alarmManagers = new ArrayList<>();
         pendingIntents = new ArrayList<>();
 
-        for (int i = 0; i < remindNotes.size() - 1; i++) {
+        for (int i = 0, j = 0; i < remindNotes.size(); i++) {
             if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
                 continue;
 
@@ -84,8 +85,10 @@ public class MainActivity extends AppCompatActivity {
             alarmManagers.add(alarmManagerTemp);
             pendingIntents.add(pendingIntentTemp);
             alarmManagerTemp.setExact(AlarmManager.RTC_WAKEUP, remindNotes.get(i).getDate()
-                    , pendingIntents.get(i));
+                    , pendingIntents.get(j));
+            j++;
         }
+        System.out.println("------ON CREATE------");
         //task
         //1. click notification then start RemindAddition activity (v)
         //2. update notification when close app
@@ -95,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        for (int i = 0; i < remindNotes.size() - 1; i++) {
+
+        for (int i = 0, j = 0; i < remindNotes.size(); i++) {
             if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
                 continue;
 
@@ -107,14 +111,18 @@ public class MainActivity extends AppCompatActivity {
             alarmManagers.add(alarmManagerTemp);
             pendingIntents.add(pendingIntentTemp);
             alarmManagerTemp.setExact(AlarmManager.RTC_WAKEUP, remindNotes.get(i).getDate()
-                    , pendingIntents.get(i));
+                    , pendingIntents.get(j));
+            j++;
         }
+
+        System.out.println("------ON STOP------");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        for (int i = 0; i < remindNotes.size() - 1; i++) {
+
+        for (int i = 0, j = 0; i < remindNotes.size(); i++) {
             if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
                 continue;
 
@@ -126,14 +134,18 @@ public class MainActivity extends AppCompatActivity {
             alarmManagers.add(alarmManagerTemp);
             pendingIntents.add(pendingIntentTemp);
             alarmManagerTemp.setExact(AlarmManager.RTC_WAKEUP, remindNotes.get(i).getDate()
-                    , pendingIntents.get(i));
+                    , pendingIntents.get(j));
+            j++;
         }
+
+        System.out.println("------ON PAUSE------");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        for (int i = 0; i < remindNotes.size() - 1; i++) {
+
+        for (int i = 0, j = 0; i < remindNotes.size(); i++) {
             if(remindNotes.get(i).getDate() < Calendar.getInstance().getTimeInMillis())
                 continue;
 
@@ -145,8 +157,11 @@ public class MainActivity extends AppCompatActivity {
             alarmManagers.add(alarmManagerTemp);
             pendingIntents.add(pendingIntentTemp);
             alarmManagerTemp.setExact(AlarmManager.RTC_WAKEUP, remindNotes.get(i).getDate()
-                    , pendingIntents.get(i));
+                    , pendingIntents.get(j));
+            j++;
         }
+
+        System.out.println("------ON DESTROY------");
     }
 
     @Override

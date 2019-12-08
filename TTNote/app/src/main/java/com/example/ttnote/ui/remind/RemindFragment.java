@@ -86,7 +86,7 @@ public class RemindFragment extends Fragment {
                 TTNoteDatabase db = new TTNoteDatabase(getContext());
                 db.addNote(note);
                 notes.clear();
-                notes.addAll(db.getAllNotes());
+                notes.addAll(db.getAllRemindNotes());
                 noteAdapter.notifyDataSetChanged();
             }
             if (requestCode == UPDATE_REMIND_NOTE_CODE) {

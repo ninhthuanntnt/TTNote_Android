@@ -12,26 +12,24 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:theme="@style/AppTheme">
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp">
             <EditText
                 android:id="@+id/edt_search"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
                 android:hint="search"
-                android:layout_weight="0.9"/>
-            <ImageView
-                android:id="@+id/btn_search"
-                android:layout_width="0dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_search_64"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="10dp"
-                android:layout_weight="0.1"
-                android:clickable="true"/>
-        </LinearLayout>
+                android:inputType="text" />
+            <ImageButton
+                android:id="@+id/btn_voice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/transparent"
+                android:src="@drawable/ic_keyboard_voice_black_32dp"
+                android:layout_alignParentRight="true"/>
+        </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
     <LinearLayout
         android:layout_width="match_parent"
