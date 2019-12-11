@@ -1,35 +1,38 @@
 package com.example.ttnote.ui.send;
 
+
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
-
 import com.example.ttnote.R;
 
 public class SendFragment extends Fragment {
 
-    private SendViewModel sendViewModel;
-
+    private TextView textView;
+    private ImageView imageView;
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        sendViewModel =
-                ViewModelProviders.of(this).get(SendViewModel.class);
         View root = inflater.inflate(R.layout.fragment_help, container, false);
-        final TextView textView = root.findViewById(R.id.text_send);
-        sendViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
+
+        //init
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        textView = root.findViewById(R.id.name1);
+        imageView = root.findViewById(R.id.image);
+
+        String htmlcontent = ("<h1>About Us</h1><ul><li>Nguyễn Thái Ninh Thuận</li><li>Nguyễn Sỹ Tuấn Thành</li><li>Lớp 17T2 - Nhóm 17N11</li></ul>" +"<a href=\"https://github.com/ninhthuanntnt/Android_CND-\">Link gitHud:</a>");
+        textView.setText(Html.fromHtml(htmlcontent));
+        imageView.setImageResource(R.drawable.borntoshine);
         return root;
     }
 }
