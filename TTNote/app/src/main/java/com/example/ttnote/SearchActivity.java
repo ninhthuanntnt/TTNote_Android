@@ -10,54 +10,65 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.ttnote.Model.NoteModel;
 import com.example.ttnote.adapters.NoteAdapter;
 import com.example.ttnote.database.TTNoteDatabase;
+import com.thebluealliance.spectrum.SpectrumPalette;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class SearchActivity extends AppCompatActivity {
+    private LinearLayout llContainer;
     private EditText edtSearch;
     private ImageButton btnVoice;
+    private SpectrumPalette colorPalette;
     private RecyclerView rv;
     private ArrayList<NoteModel> notes;
     private NoteAdapter noteAdapter;
     private TTNoteDatabase db;
     private Context context;
 
-    private int requestCode;
+    private int updateCode;
     private static final int UPDATE_NOTE_CODE = 6515;
     private static final int UPDATE_TASK_NOTE_CODE = 9541;
     private static final int UPDATE_REMIND_NOTE_CODE = 6012;
     private static final int SPEECH_INPUT_CODE = 1111;
+    private static final int UPDATE_DELETED_NOTE_CODE = 3030;
 
+    Integer color;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
-        Toolbar toolbar = findViewById(R.id.tool_bar);
+        final Toolbar toolbar = findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("");
         this.context = this;
         //init
-        requestCode = getIntent().getIntExtra("requestCode", UPDATE_NOTE_CODE);
+        llContainer = findViewById(R.id.ll_container);
+        color = null;
+        colorPalette = findViewById(R.id.color_palette);
+        updateCode = getIntent().getIntExtra("requestCode", UPDATE_NOTE_CODE);
         notes = new ArrayList<>();
-        noteAdapter = new NoteAdapter(notes, null, requestCode);
+        noteAdapter = new NoteAdapter(notes, null, updateCode);
         edtSearch = toolbar.findViewById(R.id.edt_search);
         btnVoice = toolbar.findViewById(R.id.btn_voice);
         rv = findViewById(R.id.recycler_view);
@@ -68,12 +79,20 @@ public class SearchActivity extends AppCompatActivity {
         rv.setLayoutManager(new LinearLayoutManager(this));
         db = new TTNoteDatabase(this);
         // Event
+        edtSearch.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                colorPalette.setVisibility(View.VISIBLE);
+                return false;
+            }
+        });
         edtSearch.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                         (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     searchNote();
+                    colorPalette.setVisibility(View.GONE);
 //                    return true;
                 }
                 return false;
@@ -87,7 +106,9 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                searchNote();
+                if(s.length() > 0)
+                    searchNote();
+
             }
 
             @Override
@@ -95,6 +116,17 @@ public class SearchActivity extends AppCompatActivity {
 
             }
         });
+        colorPalette.setOnColorSelectedListener(
+                new SpectrumPalette.OnColorSelectedListener() {
+                    @Override
+                    public void onColorSelected(int clr) {
+                        color = clr;
+                        llContainer.setBackgroundColor(clr);
+                        searchNote();
+                    }
+                }
+        );
+        // Default color
         btnVoice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,6 +174,13 @@ public class SearchActivity extends AppCompatActivity {
                         .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                 edtSearch.setText(result.get(0));
             }
+            if (requestCode == UPDATE_DELETED_NOTE_CODE){
+                Bundle bundle = data.getExtras();
+                NoteModel note = (NoteModel) bundle.getSerializable("note");
+                db.updateTaskNote(note);
+                searchNote();
+                noteAdapter.notifyDataSetChanged();
+            }
         }
     }
 
@@ -149,12 +188,14 @@ public class SearchActivity extends AppCompatActivity {
     public void searchNote(){
         String value = edtSearch.getText().toString();
         notes.clear();
-        if(requestCode == UPDATE_NOTE_CODE)
-            notes.addAll(db.searchNote(value));
-        if(requestCode == UPDATE_TASK_NOTE_CODE)
-            notes.addAll(db.searchTaskNote(value));
-        if(requestCode == UPDATE_REMIND_NOTE_CODE)
-            notes.addAll(db.searchRemindNote(value));
+        if(updateCode == UPDATE_NOTE_CODE)
+            notes.addAll(db.searchNote(value, color));
+        if(updateCode == UPDATE_TASK_NOTE_CODE)
+            notes.addAll(db.searchTaskNote(value, color));
+        if(updateCode == UPDATE_REMIND_NOTE_CODE)
+            notes.addAll(db.searchRemindNote(value, color));
+        if (updateCode == UPDATE_DELETED_NOTE_CODE)
+            notes.addAll(db.searchDeletedNote(value, color));
         noteAdapter.notifyDataSetChanged();
     }
 

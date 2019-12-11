@@ -17,7 +17,7 @@ tools:showIn="navigation_view">
         android:icon="@drawable/ic_remind"
         android:title="@string/menu_remind" />
     <item
-        android:id="@+id/nav_tools"
+        android:id="@+id/nav_recycle_bin"
         android:icon="@drawable/ic_garbage"
         android:title="@string/menu_recycle_bin" />
 </group>

@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SearchActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:id="@+id/ll_container">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/tool_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
         android:theme="@style/AppTheme">
         <RelativeLayout
             android:layout_width="match_parent"
@@ -21,7 +22,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="search"
-                android:inputType="text" />
+                android:inputType="text"
+                android:backgroundTint="@color/darkGrey"
+                android:textCursorDrawable="@color/darkGrey"/>
             <ImageButton
                 android:id="@+id/btn_voice"
                 android:layout_width="wrap_content"
@@ -31,9 +34,25 @@
                 android:layout_alignParentRight="true"/>
         </RelativeLayout>
     </androidx.appcompat.widget.Toolbar>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center">
+        <com.thebluealliance.spectrum.SpectrumPalette
+            android:id="@+id/color_palette"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="10dp"
+            android:gravity="center"
+            app:spectrum_autoPadding="true"
+            app:spectrum_columnCount="6"
+            app:spectrum_outlineWidth="0.5dp"
+            app:spectrum_colors="@array/colors_palette"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:padding="5dp">
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

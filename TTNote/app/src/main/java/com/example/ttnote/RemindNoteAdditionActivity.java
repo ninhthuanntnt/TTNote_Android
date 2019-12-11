@@ -61,6 +61,7 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
         note = new NoteModel();
         scheduleNote = Calendar.getInstance();
         scheduleNote.add(Calendar.DAY_OF_MONTH, 1);
+        scheduleNote.set(Calendar.SECOND, 0);
         intent = getIntent();
         calendar = Calendar.getInstance();
 
@@ -79,7 +80,11 @@ public class RemindNoteAdditionActivity extends AppCompatActivity {
 
         }
 
-        navBottom.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED);
+        navBottom.getMenu().getItem(0).setCheckable(false).setChecked(false);
+        navBottom.getMenu().getItem(1).setCheckable(false).setChecked(false);
+        navBottom.getMenu().getItem(2).setCheckable(false).setChecked(false);
+        navBottom.getMenu().getItem(3).setCheckable(false).setChecked(false);
+        navBottom.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_LABELED);
         navBottom.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {

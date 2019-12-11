@@ -1,5 +1,7 @@
 package com.example.ttnote.Model;
 
+import androidx.annotation.Nullable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -93,5 +95,10 @@ public class NoteModel implements Serializable {
 
     public void setTasks(ArrayList<TaskModel> tasks) {
         this.tasks = tasks;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object note) {
+        return ((NoteModel)note).getId() == this.getId();
     }
 }

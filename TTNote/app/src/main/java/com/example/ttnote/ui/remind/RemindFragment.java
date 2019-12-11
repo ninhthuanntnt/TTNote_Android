@@ -11,7 +11,9 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,9 +22,11 @@ import com.example.ttnote.NoteAdditionActivity;
 import com.example.ttnote.R;
 import com.example.ttnote.RemindNoteAdditionActivity;
 import com.example.ttnote.SearchActivity;
+import com.example.ttnote.SwipeToDeleteCallback;
 import com.example.ttnote.adapters.NoteAdapter;
 import com.example.ttnote.database.TTNoteDatabase;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -34,6 +38,7 @@ public class RemindFragment extends Fragment {
     private RecyclerView rvRemindNoteList;
     private TTNoteDatabase db;
     private FloatingActionButton btnAdd;
+    private CoordinatorLayout clContainerSnackbar;
 
     public static final int ADD_REMIND_NOTE_CODE = 1004;
     public static final int UPDATE_REMIND_NOTE_CODE = 6012;
@@ -47,6 +52,7 @@ public class RemindFragment extends Fragment {
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         db = new TTNoteDatabase(getContext());
         rvRemindNoteList = root.findViewById(R.id.rv_remind_note_list);
+        clContainerSnackbar = root.findViewById(R.id.cl_container_snackbar);
         btnAdd = root.findViewById(R.id.btn_add);
         notes = db.getAllRemindNotes();
 
@@ -56,6 +62,8 @@ public class RemindFragment extends Fragment {
         rvRemindNoteList.setLayoutManager(new LinearLayoutManager(root.getContext()));
 
         //set event
+        enableSwipeToDeleteAndUndo();
+
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,8 +103,14 @@ public class RemindFragment extends Fragment {
 
                 TTNoteDatabase db = new TTNoteDatabase(getContext());
                 db.updateNote(note);
-                notes.clear();
-                notes.addAll(db.getAllRemindNotes());
+
+                // remove when status is false
+                int position = notes.indexOf(note);
+                notes.remove(note);
+                if (note.isStatus())
+                    notes.add(position, note);
+                else
+                    showSnackBar(position, note);
                 noteAdapter.notifyDataSetChanged();
             }
 
@@ -106,5 +120,42 @@ public class RemindFragment extends Fragment {
             notes.addAll(db.getAllRemindNotes());
             noteAdapter.notifyDataSetChanged();
         }
+    }
+    private void enableSwipeToDeleteAndUndo(){
+        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(noteAdapter) {
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                final int position = viewHolder.getAdapterPosition();
+                final NoteModel note = notes.get(position);
+
+                //remove note
+                note.setStatus(false);
+                db.updateNoteStatus(note);
+                notes.remove(note);
+                noteAdapter.notifyItemRemoved(position);
+                //show snackbar
+                showSnackBar(position, note);
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeToDeleteCallback);
+        itemTouchHelper.attachToRecyclerView(rvRemindNoteList);
+    }
+
+    private void showSnackBar(final int position,final NoteModel note){
+        Snackbar snackbar = Snackbar.make(clContainerSnackbar, "Remind note was removed from the list.", Snackbar.LENGTH_LONG);
+        snackbar.setAction("UNDO", new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                //restore note
+                note.setStatus(true);
+                db.updateNoteStatus(note);
+                notes.add(position, note);
+                noteAdapter.notifyItemInserted(position);
+            }
+        });
+        snackbar.setActionTextColor(getResources().getColor(R.color.colorAccent));
+        snackbar.show();
     }
 }

@@ -124,13 +124,14 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
         db.update("note", value, "id = ? ", new String[]{String.valueOf(note.getId())});
     }
 
-    public ArrayList<NoteModel> searchNote(String value) {
+    public ArrayList<NoteModel> searchNote(String value, Integer color) {
         value = "%" + value + "%";
+        String colorConditionScript = (color != null) ? "AND note.background = " + color : "";
         ArrayList<NoteModel> notes = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM note LEFT OUTER JOIN task " +
                 " ON note.id = task.note_id " +
-                " WHERE note.date = 0 " +
+                " WHERE note.date = 0 " + colorConditionScript +
                 " AND task.note_id IS NULL " +
                 " AND (note.title LIKE ? OR note.content LIKE ?) " +
                 " AND note.status = 1 ", new String[]{value, value});
@@ -154,15 +155,16 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
         return notes;
     }
 
-    public ArrayList<NoteModel> searchTaskNote(String value) {
+    public ArrayList<NoteModel> searchTaskNote(String value, Integer color) {
         value = "%" + value + "%";
+        String colorConditionScript = (color != null) ? "AND note.background = " + color : "";
         ArrayList<NoteModel> notes = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(" SELECT note.* FROM note JOIN task " +
                         " ON note.id = task.note_id " +
                         " WHERE note.date = 0 " +
                         " AND (note.title LIKE ? OR note.content LIKE ? OR task.task_name LIKE ?) " +
-                        " AND note.status = 1 "
+                        " AND note.status = 1 " + colorConditionScript
                 , new String[]{value, value, value});
 
         cursor.moveToFirst();
@@ -301,14 +303,15 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
         return notes;
     }
 
-    public ArrayList<NoteModel> searchRemindNote(String value) {
+    public ArrayList<NoteModel> searchRemindNote(String value, Integer color) {
         value = "%" + value + "%";
+        String colorConditionScript = (color != null) ? "AND note.background = " + color : "";
         ArrayList<NoteModel> notes = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM note LEFT OUTER JOIN task " +
                 " ON note.id = task.note_id " +
                 " WHERE note.date != 0 " +
-                " AND task.note_id IS NULL " +
+                " AND task.note_id IS NULL " + colorConditionScript +
                 " AND (note.title LIKE ? OR note.content LIKE ?) " +
                 " AND note.status = 1 ", new String[]{value, value});
 
@@ -329,5 +332,87 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
         }
         cursor.close();
         return notes;
+    }
+
+    public ArrayList<NoteModel> getAllDeletedNote(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ArrayList<NoteModel> notes = new ArrayList<>();
+        Cursor cursor = db.rawQuery(" SELECT * FROM note WHERE status = 0", null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            NoteModel note = new NoteModel();
+            // 1: id, 2:title, 3: content, 4: created_date, 5: date, 6: background, 7: status
+            note.setId(cursor.getInt(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(cursor.getString(2));
+            note.setCreatedDate(cursor.getLong(3));
+            note.setDate(cursor.getLong(4));
+            note.setBackground(cursor.getInt(5));
+            note.setStatus(!(cursor.getInt(6) == 0));
+
+            notes.add(note);
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        for(NoteModel noteTemp : notes){
+            ArrayList<TaskModel> tasks = this.getTasksByNoteId(noteTemp.getId());
+            if(tasks.size() > 0){
+                noteTemp.setTasks(tasks);
+            }
+        }
+        return notes;
+    }
+
+    public ArrayList<NoteModel> searchDeletedNote(String value, Integer color) {
+        value = "%" + value + "%";
+        String colorConditionScript = (color != null) ? "AND note.background = " + color : "";
+        ArrayList<NoteModel> notes = new ArrayList<>();
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM note " +
+                " WHERE status = 0 " + colorConditionScript, null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            NoteModel note = new NoteModel();
+            // 1: id, 2:title, 3: content, 4: created_date, 5: date, 6: background, 7: status
+            note.setId(cursor.getInt(0));
+            note.setTitle(cursor.getString(1));
+            note.setContent(cursor.getString(2));
+            note.setCreatedDate(cursor.getLong(3));
+            note.setDate(cursor.getLong(4));
+            note.setBackground(cursor.getInt(5));
+            note.setStatus(!(cursor.getInt(6) == 0));
+
+            notes.add(note);
+            cursor.moveToNext();
+        }
+        for(NoteModel noteTemp : notes){
+            ArrayList<TaskModel> tasks = this.getTasksByNoteId(noteTemp.getId());
+            if(tasks.size() > 0){
+                noteTemp.setTasks(tasks);
+            }
+        }
+        cursor.close();
+        return notes;
+    }
+
+    public void updateNoteStatus(NoteModel note){
+        ContentValues values = new ContentValues();
+        SQLiteDatabase db = this.getWritableDatabase();
+        values.put("status", (note.isStatus())?1:0);
+
+        db.update(NOTE_TABLE_NAME, values, "id = ?", new String[]{String.valueOf(note.getId())});
+    }
+
+    public void deleteNote(NoteModel note){
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(NOTE_TABLE_NAME, "id = ?", new String[]{String.valueOf(note.getId())});
+        if(note.getTasks() != null && note.getTasks().size() > 0){
+            for(TaskModel taskTemp : note.getTasks()){
+                db.delete(TASK_TABLE_NAME, "id = ?", new String[]{String.valueOf(taskTemp.getId())});
+            }
+        }
     }
 }

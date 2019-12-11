@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_note, R.id.nav_task, R.id.nav_remind,
-                R.id.nav_tools, R.id.nav_share, R.id.nav_send)
+                R.id.nav_recycle_bin, R.id.nav_share, R.id.nav_send)
                 .setDrawerLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
@@ -169,9 +169,10 @@ public class MainActivity extends AppCompatActivity {
 
             AlarmManager alarmManagerTemp = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("id", remindNotes.get(i).getId());
             intent.setAction(String.valueOf(remindNotes.get(i).getId()));
-            PendingIntent pendingIntentTemp = PendingIntent.getBroadcast(this, i, intent, 0);
+            PendingIntent pendingIntentTemp = PendingIntent.getBroadcast(this, i, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             alarmManagers.add(alarmManagerTemp);
             pendingIntents.add(pendingIntentTemp);
             alarmManagerTemp.setExact(AlarmManager.RTC_WAKEUP, remindNotes.get(i).getDate()

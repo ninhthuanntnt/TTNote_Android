@@ -43,9 +43,10 @@ public class NotificationHelper extends ContextWrapper {
     }
 
     public NotificationCompat.Builder getChannelNotification(NoteModel remindNote) {
-        Intent resultIntent = new Intent(this, RemindNoteAdditionActivity.class);
+        Intent resultIntent = new Intent(this, AlarmActivity.class);
         Bundle bundle = new Bundle();
-        bundle.putSerializable("note", remindNote);
+        bundle.putSerializable("remindNote", remindNote);
+        resultIntent.putExtra("isFromNotification", true);
         resultIntent.putExtras(bundle);
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this, remindNote.getId(), resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);

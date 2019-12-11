@@ -61,8 +61,9 @@ public class NoteAdditionActivity extends AppCompatActivity {
 
         }
 
-
-        navBottom.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_UNLABELED);
+        navBottom.getMenu().getItem(0).setCheckable(false).setChecked(false);
+        navBottom.getMenu().getItem(1).setCheckable(false).setChecked(false);
+        navBottom.setLabelVisibilityMode(LabelVisibilityMode.LABEL_VISIBILITY_LABELED);
         navBottom.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {

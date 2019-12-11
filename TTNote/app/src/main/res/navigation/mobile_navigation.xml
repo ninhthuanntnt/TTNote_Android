@@ -24,8 +24,8 @@
         tools:layout="@layout/fragment_remind" />
 
     <fragment
-        android:id="@+id/nav_tools"
-        android:name="com.example.ttnote.ui.tools.ToolsFragment"
+        android:id="@+id/nav_recycle_bin"
+        android:name="com.example.ttnote.ui.recycle_bin.RecycleBinFragment"
         android:label="@string/menu_recycle_bin"
         tools:layout="@layout/fragment_recycle_bin" />
 

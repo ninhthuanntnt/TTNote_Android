@@ -30,8 +30,6 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.1.0'
     implementation 'androidx.navigation:navigation-ui:2.1.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
-    implementation 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
-    implementation 'com.github.yukuku:ambilwarna:2.0.1'
     implementation 'petrov.kristiyan:colorpicker-library:1.1.10'
     implementation 'com.thebluealliance:spectrum:0.7.1'
     testImplementation 'junit:junit:4.12'
