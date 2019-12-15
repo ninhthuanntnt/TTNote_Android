@@ -27,6 +27,7 @@ public class SendFragment extends Fragment {
 
         //init
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        toolbar.setVisibility(View.GONE);
         textView = root.findViewById(R.id.name1);
         imageView = root.findViewById(R.id.image);
 

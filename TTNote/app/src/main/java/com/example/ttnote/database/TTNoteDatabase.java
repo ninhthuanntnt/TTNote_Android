@@ -160,7 +160,7 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
         String colorConditionScript = (color != null) ? "AND note.background = " + color : "";
         ArrayList<NoteModel> notes = new ArrayList<>();
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(" SELECT note.* FROM note JOIN task " +
+        Cursor cursor = db.rawQuery(" SELECT DISTINCT note.* FROM note JOIN task " +
                         " ON note.id = task.note_id " +
                         " WHERE note.date = 0 " +
                         " AND (note.title LIKE ? OR note.content LIKE ? OR task.task_name LIKE ?) " +
@@ -202,6 +202,8 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
     public void addTask(TaskModel task) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues value = new ContentValues();
+        if(task.getTaskName() == null || task.getTaskName().trim().isEmpty())
+            return;
         value.put("task_name", task.getTaskName());
         value.put("status", (task.isStatus()) ? 1 : 0);
         value.put("note_id", task.getNoteId());
@@ -214,6 +216,7 @@ public class TTNoteDatabase extends SQLiteOpenHelper {
         //update the tasks
         for (TaskModel task : note.getTasks()) {
             //check if task doesn't exist
+
             if (task.getId() == 0) {
                 task.setNoteId(note.getId());
                 this.addTask(task);
